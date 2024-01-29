@@ -1,0 +1,30 @@
+steps:
+- name: 'python'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    pip install --upgrade bump-my-version
+    bash ./make.sh
+- id: Git Commit
+  name: gcr.io/cloud-builders/git
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    export GITHUB_TOKEN=$$GITHUB_TOKEN
+    git config --global user.name pdp-automation
+    git config --global user.email pdp-automation@plarium.com
+    git checkout $BRANCH_NAME
+    next_version=$(echo VERSION)
+    git commit . -m "Bump version to $next_version"
+    git push && git push --tags
+  secretEnv: ['GITHUB_TOKEN']
+options:
+  logging: CLOUD_LOGGING_ONLY
+  pool:
+    name: 'projects/pdp-shared-infra/locations/us-central1/workerPools/pdp-shared-infra-pool'
+availableSecrets:
+  secretManager:
+    - versionName: projects/pdp-shared-infra/secrets/github-token/versions/latest
+      env: 'GITHUB_TOKEN'
