@@ -22,6 +22,11 @@ Paperless bridges the gap between Papermill and Google Cloud Dataproc Serverless
 
 - **Cost-Effective:** Pay only for the resources you consume during the execution, optimizing costs for your notebook parameterization tasks.
 
+Pricing model is much more cost-effective considering other platofrms and technologies 
+
+![https://cloud.google.com/dataproc-serverless/pricing](./images/pricing_model.png)
+*resource*: https://cloud.google.com/dataproc-serverless/pricing
+
 ## Getting Started
 
 ### Prerequisites
