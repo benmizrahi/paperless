@@ -122,4 +122,5 @@ paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
 
 
 ---
- Made With Love ( :heart: ) & Respect ( :kneeling_person: )  :israel: :israel: 
+ Made With Love :heart: & Respect :kneeling_person:   
+ :israel: :israel: 
