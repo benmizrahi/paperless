@@ -125,8 +125,3 @@ paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
 [Contribution](CONTRIBUTION)
 
 [Code Of Conduct](CODE_OF_CONDUCT)
-
-
----
- Made With Love :heart: & Respect :kneeling_person:   
- :israel: :israel: 
