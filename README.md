@@ -9,10 +9,6 @@ Made With Love ❤️ from  :israel: :israel:
 
 Papermill is a powerful tool for parameterizing and executing Jupyter Notebooks. However, by default papermill dosn't support [Jupyter Kernel Gateway](https://jupyter-kernel-gateway.readthedocs.io/en/latest/) - it was impossible to run spark notebook vs Google Cloud Dataproc Serverless environment with Papermill tool - this is where Paperless helps.
 
-#A papermill implementation to run notebooks inside dataproc serverless
-
-
-
 Paperless bridges the gap between Papermill and Google Cloud Dataproc Serverless interactive mode, allowing you to seamlessly integrate the two and harness the power of serverless execution for your Jupyter Notebooks.
 
 ## Features
