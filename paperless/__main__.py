@@ -27,9 +27,12 @@ def PaperlessExecuter(*args, **kwargs):
     Returns:
         The result of executing the Paperless application.
     """
+    template_name = None 
+    if 'template_name' in kwargs:
+        template_name = kwargs['template_name']
     logger.info("paperless execution started!")
     return Paperless(notebook_path=kwargs['input_path'],
-                     template_name=kwargs['template_name']).\
+                     template_name=template_name).\
         configure().\
         wait_for_session().\
         verify().\

@@ -7,7 +7,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="paperless",
-    version="1.4.1",
+    version="1.4.2",
     description="A papermill implementation to run notebooks inside dataproc serverless",
     long_description = long_description,
     long_description_content_type = "text/markdown",
