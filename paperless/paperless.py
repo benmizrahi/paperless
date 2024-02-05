@@ -69,7 +69,7 @@ class Paperless():
             if templateName is not None:
                 self.session_template =  serverless_manager.build_session_template(templateName)
             else: 
-                serverless_manager.build_session_template()
+                self.session_template = serverless_manager.build_session_template()
             self.notebook['metadata'][METADATA_KEY] = {"session_id": self.sessionid, "kernel_name": self.kernel_name, "session_template": self.session_template}
             notebook_manager.save_notebook(self.notebook, self.notebook_path)
             logger.debug("saved new notebook with metadata")
