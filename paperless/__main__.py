@@ -1,6 +1,7 @@
 
 from collections import OrderedDict
 import inspect
+import os
 import sys
 from pydoc import cli
 import papermill
@@ -27,14 +28,12 @@ def PaperlessExecuter(*args, **kwargs):
     Returns:
         The result of executing the Paperless application.
     """
-    template_name = None 
-    if 'template_name' in kwargs:
-        template_name = kwargs['template_name']
-    logger.info("paperless execution started!")
+    template_name = os.getenv("TEMPLATE_NAME", "")
+    logger.info("paperless execution started! with template_name: {template_name}", template_name=template_name)
     return Paperless(notebookPath=kwargs['input_path'], \
                      templateName=template_name).\
         configure().\
-        wait_for_session().\
+        build_session().\
         verify().\
         execute(args,kwargs).\
         shutdown()
