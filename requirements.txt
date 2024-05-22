@@ -4,3 +4,4 @@ pytest
 loguru
 gcsfs
 click
+jupyter_client
