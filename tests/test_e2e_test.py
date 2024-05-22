@@ -11,7 +11,7 @@ def test_e2e_process(*args, **kwargs):
     Paperless(
         notebookPath=f'./tests/resources/test.ipynb').\
         configure().\
-        wait_for_session().\
+        build_session().\
         verify().\
         execute(args,kwargs).\
         shutdown()

@@ -6,7 +6,7 @@ class ServerlessMixingKernelManager(MixingKernelManager):
 
     def __init__(self, c_kernel, c_kernel_spec,  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.kernel_id = c_kernel[0]['id']
+        self.kernel_id = c_kernel['id']
         self.kernel_name = c_kernel_spec['default']
         self.remote_manager =  ServerlessGatewayKernelClient(
             kernel_id=self.kernel_id ,

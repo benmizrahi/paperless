@@ -75,11 +75,12 @@ the minimum needed for testing:
 ```bash
  paperless <input_path> <output_path> ...
 ``` 
-An extra parameter that is special for Paperless: --template_name
+An extra environment variable  that is special for Paperless:  TEMPLATE_NAME=paperless-interactive
 Example:
 
 ```bash
- paperless ./resources/spark.ipynb ./resources/spark-out.ipynb --template_name paperless-interactive
+ export TEMPLATE_NAME=paperless-interactive && \
+     paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
 
 ```
 
@@ -111,7 +112,7 @@ pip install -r requirements.txt
 python setup.py install 
 
 # Execute example
-paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
+export TEMPLATE_NAME=paperless-interactive && paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
 
 ```
 

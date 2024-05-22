@@ -2,6 +2,7 @@
 
 
 import subprocess
+import time
 from loguru import logger
 from tornado.escape import json_decode
 import paperless.constants as constants
@@ -11,6 +12,17 @@ def build_session_template(templateName=constants.DEFAULT_SESSION_TEMPLATE_NAME)
     project_id = gcp_project()
     region = gcp_region()
     return f"projects/{project_id}/regions/{region}/sessionTemplates/{templateName}"
+
+def recognize_dataproc_sessionid(metadata):
+    endpointParentResource = metadata.get("endpointParentResource")
+    return endpointParentResource.split("/")[-1]
+
+def wait_til_ready(sessionid):
+    logger.debug("waiting for session to be ready")
+    while not is_session_active_and_ready(sessionid):
+        logger.debug("session is not ready, waiting for 5 seconds")
+        time.sleep(5)
+    logger.debug("session is ready")
 
 def is_session_active_and_ready(sessionid):
     logger.debug("checking if session is active and ready")

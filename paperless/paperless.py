@@ -6,7 +6,7 @@ from loguru import logger
 from .kernels.kernel_manager import ServerlessMixingKernelManager
 from jupyter_server.gateway.gateway_client import GatewayClient
 
-from tornado.escape import json_decode
+from tornado.escape import json_decode, json_encode
 from jupyter_server.gateway.gateway_client import gateway_request
 from jupyter_server.utils import url_path_join
 from dataproc_jupyter_plugin.handlers import get_cached_credentials
@@ -56,22 +56,19 @@ class Paperless():
         if METADATA_KEY in metadata and  serverless_manager.\
             is_session_active_and_ready(metadata[METADATA_KEY]["session_id"]):
             logger.debug("found metadata in notebook: ", metadata[METADATA_KEY])
-            self.sessionid = metadata[METADATA_KEY]["session_id"]
+            self.dataproc_sessionid = metadata[METADATA_KEY]["session_id"]
             self.kernel_name = metadata[METADATA_KEY]["kernel_name"]
             self.session_template = metadata[METADATA_KEY]["session_template"]
             self.session_exists = True
             self.session_ready = False
         else:
             logger.debug("no metadata found in notebook, generating new session")
-            self.sessionid = str(uuid.uuid4())
-            self.kernel_name =  f"paperless-{self.sessionid}"
 
             if templateName is not None:
                 self.session_template =  serverless_manager.build_session_template(templateName)
             else: 
                 self.session_template = serverless_manager.build_session_template()
-            self.notebook['metadata'][METADATA_KEY] = {"session_id": self.sessionid, "kernel_name": self.kernel_name, "session_template": self.session_template}
-            notebook_manager.save_notebook(self.notebook, self.notebook_path)
+
             logger.debug("saved new notebook with metadata")
             self.session_exists = False
             self.session_ready = False
@@ -95,21 +92,7 @@ class Paperless():
         logger.debug("configured gateway client")
         return self
 
-    def wait_for_session(self):
-        """
-        Waits for the session to be available and saves the notebook with session metadata.
-
-        Returns:
-            self: The current instance of the InteractiveSession class.
-        """
-        ## getting session
-        logger.debug("waiting for session")
-        if not self.session_exists:
-            serverless_manager.create_session(sessionid=self.sessionid, templateName=self.session_template)
-        logger.debug("session created")
-        return self
-
-    def verify(self):
+    def build_session(self):
         """
         Verifies the session by getting the kernel spec and preparing the kernel.
 
@@ -118,6 +101,19 @@ class Paperless():
         """
         asyncio.run(self.get_kernel_spec())
         asyncio.run(self.prepare_the_kernel())
+        logger.debug("building session with kernel: ", self.kernel)
+        self.dataproc_sessionid = serverless_manager.recognize_dataproc_sessionid(self.kernel.get("metadata"))
+        logger.debug("dataproc session id: ", self.dataproc_sessionid)
+        self.notebook['metadata'][METADATA_KEY] = {"session_id": self.dataproc_sessionid, "kernel_name": self.kernel.get("name"), "session_template": self.session_template, "kernel_name_e": \
+                                                   self.kernel.get("kernel_name_e"), "kernel_id_e": self.kernel.get("id") }
+        
+        notebook_manager.save_notebook(self.notebook, self.notebook_path)
+        logger.debug("saved notebook with metadata")
+        return self
+
+    def verify(self):
+
+        serverless_manager.wait_til_ready(self.dataproc_sessionid)
         return self
 
     def execute(self, *args, **kwargs):
@@ -140,8 +136,7 @@ class Paperless():
         """
         Shuts down the session.
         """
-        # serverless_manager.delete_session(sessionid=self.sessionid)
-        # sys.exit()
+        serverless_manager.delete_session(sessionid=self.dataproc_sessionid)
 
     async def get_kernel_spec(self):
         """
@@ -161,14 +156,45 @@ class Paperless():
         """
         Prepares the kernel.
         """
+        notebook_metadata = self.notebook['metadata']
+        endpoint_kernels = await self.get_kernels()
+        if endpoint_kernels is not None and len(endpoint_kernels) > 0:
+            if METADATA_KEY in notebook_metadata:
+                kernel = next((x for x in endpoint_kernels if x["id"] == notebook_metadata[METADATA_KEY]["kernel_id_e"]), None)
+                if kernel is not None:
+                    self.kernel = kernel
+                    return self.kernel
+                else:
+                    return await self.build_kernel()
+            else:
+                self.kernel = endpoint_kernels[0]
+                return self.kernel  
+        else:   
+            return await self.build_kernel()
+        
+    async def build_kernel(self):
+        try:
+            kernels_url = url_path_join(GatewayClient.instance().url, GatewayClient.instance().kernels_endpoint)
+            start_responed = await gateway_request(
+                kernels_url,
+                method="POST",
+                body=json_encode({ "name": self.kernel_spec.get("default")}),
+                headers={"Content-Type": "application/json","Cookie": "_xsrf=XSRF", "X-XSRFToken": "XSRF","authorization":"Bearer " + self.crad["access_token"]},
+            )
+            self.kernel = json_decode(start_responed.body)
+            return self.kernel
+        except Exception as e:
+            logger.error(e)
+            raise e
+ 
+    async def get_kernels(self):
+        """
+        Gets the kernel.
+        """
         kernels_url = url_path_join(GatewayClient.instance().url, GatewayClient.instance().kernels_endpoint)
         response = await gateway_request(
             kernels_url,
             method="GET",
             headers={"Content-Type": "application/json"},
         )
-        self.kernel = json_decode(response.body)
-        logger.debug(self.kernel)
-        return self.kernel
-        
- 
+        return json_decode(response.body)
