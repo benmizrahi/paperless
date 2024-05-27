@@ -3,8 +3,6 @@ Made With Love ❤️ from  :israel: :israel:
 
 [Paperless](https://github.com/Plarium-Repo/paperless.git) is a tool that extends the capabilities of [Papermill](https://papermill.readthedocs.io/) by providing the ability to run Papermill via [Google Cloud Dataproc Serverless](https://cloud.google.com/dataproc-serverless/docs).   
 
-[![ICON](https://skillicons.dev/icons?i=gcp,py&perline=3)](https://skillicons.dev) 
-
 ## Overview
 
 Papermill is a powerful tool for parameterizing and executing Jupyter Notebooks. However, by default papermill dosn't support [Jupyter Kernel Gateway](https://jupyter-kernel-gateway.readthedocs.io/en/latest/) - it was impossible to run spark notebook vs Google Cloud Dataproc Serverless environment with Papermill tool - this is where Paperless helps.
@@ -48,6 +46,13 @@ Open a terminal and run the following command to authenticate your Google Cloud 
 gcloud auth login
 
 gcloud auth application-default login 
+
+gcloud config set project <project_id>
+
+gcloud config set compute/region <region>
+
+gcloud config set dataproc/region <region>
+
 ```
 
 ### Step 3: Install Paperless 
@@ -58,8 +63,9 @@ pip install paperless
 
 ### Step 4: Create sessionTemplates For Paperless
 
-Parameters and details can be found in [GCP Docs](https://cloud.google.com/sdk/gcloud/reference/compute/instance-templates/create).
+Parameters and details can be found in [GCP Docs](https://cloud.google.com/sdk/gcloud/reference/compute/instance-templates/create).  
 
+The default template name is:  *paperless-interactive*
 ```bash
  gcloud compute instance-templates create paperless-interactive --<extra params...>
 ``` 
@@ -112,7 +118,7 @@ pip install -r requirements.txt
 python setup.py install 
 
 # Execute example
-export TEMPLATE_NAME=paperless-interactive && paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
+export TEMPLATE_NAME=paperless-interactive && ./.venv/bin/paperless ./tests/resources/test.ipynb ./tests/resources/test-out.ipynb
 
 ```
 
