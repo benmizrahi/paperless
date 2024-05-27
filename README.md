@@ -118,7 +118,7 @@ pip install -r requirements.txt
 python setup.py install 
 
 # Execute example
-export TEMPLATE_NAME=paperless-interactive && paperless ./resources/spark.ipynb ./resources/spark-out.ipynb
+export TEMPLATE_NAME=paperless-interactive && ./.venv/bin/paperless ./tests/resources/test.ipynb ./tests/resources/test-out.ipynb
 
 ```
 

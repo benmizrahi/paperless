@@ -112,7 +112,6 @@ class Paperless():
         return self
 
     def verify(self):
-
         serverless_manager.wait_til_ready(self.dataproc_sessionid)
         return self
 
