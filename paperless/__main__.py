@@ -1,4 +1,5 @@
 
+import asyncio
 from collections import OrderedDict
 import inspect
 import os
@@ -30,9 +31,13 @@ def PaperlessExecuter(*args, **kwargs):
     """
     template_name = os.getenv("TEMPLATE_NAME", "")
     logger.info("paperless execution started! with template_name: {template_name}", template_name=template_name)
-    return Paperless(notebookPath=kwargs['input_path'], \
+
+    loop = asyncio.get_event_loop()
+    paperless = loop.run_until_complete(Paperless(notebookPath=kwargs['input_path'], \
                      templateName=template_name).\
-        configure().\
+        configure())
+
+    return paperless.\
         build_session().\
         verify().\
         execute(args,kwargs).\

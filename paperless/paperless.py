@@ -73,13 +73,14 @@ class Paperless():
             self.session_exists = False
             self.session_ready = False
 
-    def configure(self):
+    async def configure(self):
         """
         Configures the gateway client with the necessary settings.
 
         Returns:
             self: The current instance of the InteractiveSession class.
         """
+        await self.get_crad()
         logger.debug("configuring gateway client")
         GatewayClient.instance().url = gcp_kernel_gateway_url() 
         GatewayClient.instance().kernel_ws_protocol=""
@@ -194,6 +195,8 @@ class Paperless():
             headers={"Content-Type": "application/json"},
         )
         return json_decode(response.body)
+
+
 
     async def get_crad(self):
         if self.crad is None:
