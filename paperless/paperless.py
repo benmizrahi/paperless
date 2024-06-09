@@ -9,7 +9,7 @@ from jupyter_server.gateway.gateway_client import GatewayClient
 from tornado.escape import json_decode, json_encode
 from jupyter_server.gateway.gateway_client import gateway_request
 from jupyter_server.utils import url_path_join
-from dataproc_jupyter_plugin.handlers import get_cached_credentials
+from dataproc_jupyter_plugin.handlers import credentials
 from google.cloud.jupyter_config.config import gcp_kernel_gateway_url
 from papermill.iorw import papermill_io
 
@@ -73,7 +73,7 @@ class Paperless():
             self.session_exists = False
             self.session_ready = False
 
-        self.crad = get_cached_credentials(log=None)
+        self.crad = credentials.get_cached()
         logger.debug("got credentials - ready", self.crad)
 
     def configure(self):
