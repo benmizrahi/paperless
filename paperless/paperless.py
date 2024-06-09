@@ -73,9 +73,6 @@ class Paperless():
             self.session_exists = False
             self.session_ready = False
 
-        self.crad = credentials.get_cached()
-        logger.debug("got credentials - ready", self.crad)
-
     def configure(self):
         """
         Configures the gateway client with the necessary settings.
@@ -197,3 +194,9 @@ class Paperless():
             headers={"Content-Type": "application/json"},
         )
         return json_decode(response.body)
+
+    async def get_crad(self):
+        if self.crad is None:
+            self.crad = await credentials.get_cached()
+            logger.debug("got credentials - ready", self.crad)
+        return self.crad
