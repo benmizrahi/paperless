@@ -49,7 +49,7 @@ class Paperless():
         self.papermill_io = papermill_io
         self.notebook_path = notebookPath
         self.notebook = notebook_manager.read_notebook(notebookPath)
-
+        self.crad = None
         metadata = self.notebook['metadata']
         
         # get session id from notebook metadata
